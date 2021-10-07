@@ -43,6 +43,7 @@ adminApp.get('/', (req, res) => {
 })
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
+app.use('/.well-known', express.static('./../.well-known/'))
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
 app.use('/', express.static('./../target-app-client-main/dist'))
