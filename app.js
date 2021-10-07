@@ -7,6 +7,7 @@ const PORT = isProduction
 const app = express()
 const path = require('path')
 const cors = require('cors')
+const history = require('connect-history-api-fallback')
 const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middleware/error.middleware')
 const vhost = require('./middleware/vhost.middleware')
@@ -32,6 +33,7 @@ app.use(
 )
 app.use(express.json())
 app.use(cookieParser())
+app.use(history())
 app.use(express.urlencoded({ extended: true }))
 
 const adminApp = express()
