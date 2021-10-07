@@ -3,7 +3,8 @@ const router = express.Router()
 const MagnetsController = require('./../controllers/magnets.controller')
 const MulterUtil = require('../utils/MulterUtil')
 const multer = require('multer')
-const { route } = require('express/lib/router')
+const authMiddleware = require('./../middleware/auth.middleware')
+const adminAuthMiddleware = require('./../middleware/admin-auth.middleware')
 
 const upload = multer({
   storage: MulterUtil.uploadStorage(),
@@ -26,6 +27,8 @@ const upload = multer({
  */
 router.post(
   '/',
+  authMiddleware,
+  adminAuthMiddleware,
   upload.single('image'),
   MagnetsController.add.bind(MagnetsController)
 )
@@ -38,7 +41,12 @@ router.post(
  *  'name', 'link', 'description'.
  * Ожидает новое значение (value) в теле запроса.
  */
-router.put('/field/:id/:field', MagnetsController.updateField)
+router.put(
+  '/field/:id/:field',
+  authMiddleware,
+  adminAuthMiddleware,
+  MagnetsController.updateField
+)
 
 /**
  * Обновляет изображение указанного поста
@@ -49,6 +57,8 @@ router.put('/field/:id/:field', MagnetsController.updateField)
  */
 router.put(
   '/image/:id',
+  authMiddleware,
+  adminAuthMiddleware,
   upload.single('image'),
   MagnetsController.updateThumbnail
 )
@@ -77,8 +87,11 @@ router.get('/:id', MagnetsController.getMagnet)
  * Возращает оъект в случае успеха.
  * В случае отсутствия лид-магнита с таким ID возвращает ошибку 404
  */
-router.delete('/:id', MagnetsController.delete)
-
-
+router.delete(
+  '/:id',
+  authMiddleware,
+  adminAuthMiddleware,
+  MagnetsController.delete
+)
 
 module.exports = router

@@ -1,40 +1,14 @@
 const express = require('express')
 const router = express.Router()
-const path = require('path')
 const multer = require('multer')
-const { access, constants } = require('fs')
-
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, path.resolve(__dirname, './../public/uploads/img/'))
-  },
-  filename(req, file, cb) {
-    cb(
-      null,
-      path.parse(file.originalname).name +
-        '-' +
-        Date.now() +
-        path.extname(file.originalname)
-    )
-  },
+const MulterUtil = require('../utils/MulterUtil')
+const upload = multer({
+  storage: MulterUtil.uploadStorage(),
+  fileFilter: MulterUtil.existFileFilter(),
 })
-const fileFilter = (req, file, cb) => {
-  access(
-    `${path.resolve(__dirname, './../public/uploads/img/')}/${
-      file.originalname
-    }`,
-    constants.F_OK,
-    (err) => {
-      const isNotExist = err
-        ? path.resolve(__dirname, './../public/uploads/img/')
-        : false
-      req.linkToExistsReviewImage = `/public/uploads/img/${file.originalname}`
-      cb(null, isNotExist)
-    }
-  )
-}
-const upload = multer({ storage, fileFilter })
 const ReviewsController = require('./../controllers/reviews.controller')
+const authMiddleware = require('./../middleware/auth.middleware')
+const adminAuthMiddleware = require('./../middleware/admin-auth.middleware')
 
 /**
  * Returns reviews
@@ -44,12 +18,25 @@ const ReviewsController = require('./../controllers/reviews.controller')
  * ordered: '1' - will return ordered by "review_order" column
  */
 router.get('/', ReviewsController.getReviews)
-router.post('/', upload.single('image'), ReviewsController.addReview)
+router.post(
+  '/',
+  authMiddleware,
+  adminAuthMiddleware,
+  upload.single('image'),
+  ReviewsController.addReview
+)
 router.put(
   '/:id',
+  authMiddleware,
+  adminAuthMiddleware,
   upload.single('image'),
   ReviewsController.updateReview.bind(ReviewsController)
 )
-router.delete('/:id', ReviewsController.deleteReview)
+router.delete(
+  '/:id',
+  authMiddleware,
+  adminAuthMiddleware,
+  ReviewsController.deleteReview
+)
 
 module.exports = router

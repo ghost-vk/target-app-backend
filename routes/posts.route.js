@@ -3,6 +3,8 @@ const router = express.Router()
 const multer = require('multer')
 const MulterUtil = require('../utils/MulterUtil')
 const PostsController = require('./../controllers/posts.controller')
+const authMiddleware = require('./../middleware/auth.middleware')
+const adminAuthMiddleware = require('./../middleware/admin-auth.middleware')
 
 const upload = multer({
   storage: MulterUtil.uploadStorage(),
@@ -29,6 +31,8 @@ const upload = multer({
  */
 router.post(
   '/',
+  authMiddleware,
+  adminAuthMiddleware,
   upload.single('image'),
   PostsController.addPost.bind(PostsController)
 )
@@ -59,7 +63,12 @@ router.get('/:id', PostsController.getPost)
  * Возращает оъект в случае успеха.
  * В случае отсутствия поста с таким ID возвращает ошибку 404
  */
-router.delete('/:id', PostsController.deletePost)
+router.delete(
+  '/:id',
+  authMiddleware,
+  adminAuthMiddleware,
+  PostsController.deletePost
+)
 
 /**
  * Обновляет указанное поле кроме поля изображения
@@ -69,7 +78,12 @@ router.delete('/:id', PostsController.deletePost)
  *  'posting_date', 'title', 'subtitle', 'content', 'recommended', 'category', 'tags'.
  * Ожидает новое значение (value) в теле запроса.
  */
-router.put('/field/:id/:field', PostsController.updateField)
+router.put(
+  '/field/:id/:field',
+  authMiddleware,
+  adminAuthMiddleware,
+  PostsController.updateField
+)
 
 /**
  * Обновляет изображение указанного поста
@@ -80,6 +94,8 @@ router.put('/field/:id/:field', PostsController.updateField)
  */
 router.put(
   '/thumbnail/:id',
+  authMiddleware,
+  adminAuthMiddleware,
   upload.single('image'),
   PostsController.updateThumbnail
 )
