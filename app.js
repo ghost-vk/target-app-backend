@@ -38,12 +38,12 @@ app.use(express.urlencoded({ extended: true }))
 
 const adminApp = express()
 adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
-adminApp.get('/', (req, res) => {
-  res.send('Subdomain!')
-})
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
-app.use('/.well-known', express.static('./../.well-known/'))
+app.use(
+  '/.well-known',
+  express.static(__dirname + './../.well-known/', { dotfiles: 'allow' })
+)
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
 app.use('/', express.static('./../target-app-client-main/dist'))
