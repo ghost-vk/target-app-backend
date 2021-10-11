@@ -1,4 +1,7 @@
 require('dotenv').config()
+const fs = require('fs')
+const http = require('http')
+const https = require('https')
 const express = require('express')
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = isProduction
@@ -69,9 +72,32 @@ app.use(errorMiddleware)
 
 const start = async () => {
   try {
-    app.listen(PORT, () => {
+    // http
+    const httpServer = http.createServer(app)
+    httpServer.listen(PORT, () => {
       console.log(`Server started on port ${PORT} ...`)
     })
+
+    // https
+    if (isProduction) {
+      const httpsServer = https.createServer(
+        {
+          key: fs.readFileSync(
+            '/etc/letsencrypt/live/anastasi-target.ru/privkey.pem'
+          ),
+          cert: fs.readFileSync(
+            '/etc/letsencrypt/live/anastasi-target.ru/cert.pem'
+          ),
+          ca: fs.readFileSync(
+            '/etc/letsencrypt/live/anastasi-target.ru/chain.pem'
+          ),
+        },
+        app
+      )
+      httpsServer.listen(443, () => {
+        console.log('HTTPS Server started on port 443 ...')
+      })
+    }
   } catch (err) {
     console.log(err)
   }
