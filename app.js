@@ -33,6 +33,10 @@ app.use(
 )
 app.use(express.json())
 app.use(cookieParser())
+
+// Next line should be before history() middleware
+app.use(express.static(__dirname + '/secret', { dotfiles: 'allow' }))
+
 app.use(history())
 app.use(express.urlencoded({ extended: true }))
 
@@ -40,10 +44,6 @@ const adminApp = express()
 adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
-app.use(
-  '/.well-known',
-  express.static(__dirname + './../.well-known/', { dotfiles: 'allow' })
-)
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
 app.use('/', express.static('./../target-app-client-main/dist'))
