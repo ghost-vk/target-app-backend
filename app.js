@@ -34,6 +34,17 @@ app.use(
     credentials: true,
   })
 )
+
+if (isProduction && process.env.PRODUCTION_CLIENT_URL !== 'http://localhost') {
+  app.use((req, res, next) => {
+    if (req.secure) {
+      next()
+    } else {
+      res.redirect('https://' + req.headers.host + req.url)
+    }
+  })
+}
+
 app.use(express.json())
 app.use(cookieParser())
 
@@ -79,7 +90,10 @@ const start = async () => {
     })
 
     // https
-    if (isProduction) {
+    if (
+      isProduction &&
+      process.env.PRODUCTION_CLIENT_URL !== 'http://localhost'
+    ) {
       const httpsServer = https.createServer(
         {
           key: fs.readFileSync(

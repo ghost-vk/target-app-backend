@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator')
 const ApiError = require('./../exceptions/api-error')
 const UserService = require('./../service/user.service')
+const isProduction = process.env.NODE_ENV === 'production'
 
 class UserController {
   async login(req, res, next) {
@@ -14,6 +15,7 @@ class UserController {
       res.cookie('target_app_refresh_token', userData.refreshToken, {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
+        secure: isProduction
       })
       return res.json(userData)
     } catch (e) {
@@ -35,6 +37,7 @@ class UserController {
       res.cookie('target_app_refresh_token', userData.refreshToken, {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
+        secure: isProduction
       })
       return res.json(userData)
     } catch (e) {
@@ -60,6 +63,7 @@ class UserController {
       res.cookie('target_app_refresh_token', userData.refreshToken, {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
+        secure: isProduction
       })
       return res.json(userData)
     } catch (e) {
