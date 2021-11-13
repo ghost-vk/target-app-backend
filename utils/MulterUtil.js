@@ -12,9 +12,9 @@ class MulterUtil {
         cb(
           null,
           path.parse(file.originalname).name +
-          '-' +
-          Date.now() +
-          path.extname(file.originalname)
+            '-' +
+            Date.now() +
+            path.extname(file.originalname)
         )
       },
     })

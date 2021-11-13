@@ -20,6 +20,7 @@ const reviews = require('./routes/reviews.route')
 const posts = require('./routes/posts.route')
 const magnets = require('./routes/magnets.route')
 const auth = require('./routes/auth.route')
+const mediaLibrary = require('./routes/media-library.route')
 
 const clientUrl = isProduction
   ? process.env.PRODUCTION_CLIENT_URL
@@ -50,23 +51,24 @@ app.use(cookieParser())
 
 // Next line should be before history() middleware
 app.use(express.static(__dirname + '/secret', { dotfiles: 'allow' }))
-
-app.use(history())
 app.use(express.urlencoded({ extended: true }))
-
-const adminApp = express()
-adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
-app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
-app.use('/', express.static('./../target-app-client-main/dist'))
 app.use('/s', express.static('./../target-app-static-documents/public'))
 app.use('/api/lid/', lid)
 app.use('/api/reviews/', reviews)
 app.use('/api/posts/', posts)
 app.use('/api/magnets/', magnets)
 app.use('/api/auth/', auth)
+app.use('/api/media-library/', mediaLibrary)
+
+app.use(history())
+app.use('/', express.static('./../target-app-client-main/dist'))
+
+const adminApp = express()
+adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
+app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
 app.all('*', (req, res) => {
   res

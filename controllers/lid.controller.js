@@ -1,5 +1,4 @@
 const db = require('./../db')
-const TelegramBot = require('node-telegram-bot-api')
 const { lidSchema } = require('./../utils/validation-schemes')
 require('dotenv').config()
 const {
@@ -7,7 +6,8 @@ const {
   isSupportedCountry,
   parsePhoneNumber,
 } = require('libphonenumber-js')
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true })
+const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service')
+
 
 /**
  * Controller of '/api/lid'
@@ -85,9 +85,9 @@ class LidController {
   async notificateAboutLid(data) {
     try {
       const message = `${data.name} запрашивает обратную связь через ${data.contactType}\nНомер телефона: ${data.phone}\nИсточник: ${data.source}`
-      await bot.sendMessage(process.env.CHAT_ID, message)
+      await sendMessageWithTelegramBot(process.env.CHAT_ID, message)
     } catch (err) {
-      console.log(err)
+      console.warn(err)
     }
   }
 }
