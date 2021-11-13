@@ -64,11 +64,12 @@ app.use('/api/auth/', auth)
 app.use('/api/media-library/', mediaLibrary)
 
 app.use(history())
-app.use('/', express.static('./../target-app-client-main/dist'))
 
 const adminApp = express()
 adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
+
+app.use('/', express.static('./../target-app-client-main/dist'))
 
 app.all('*', (req, res) => {
   res
