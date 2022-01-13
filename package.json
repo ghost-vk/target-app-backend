@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development nodemon app.js",
-    "production": "cross-env NODE_ENV=production node app.js"
+    "dev": "cross-env NODE_ENV=development DEBUG=* nodemon app.js",
+    "production": "cross-env NODE_ENV=production node app.js",
+    "forever": "NODE_ENV=production forever start -m 5 -e ./../logs/err.log --spinSleepTime 6000 app.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "connect-history-api-fallback": "^1.6.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "debug": "^4.3.3",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",

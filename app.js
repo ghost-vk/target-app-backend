@@ -4,9 +4,7 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const isProduction = process.env.NODE_ENV === 'production'
-const PORT = isProduction
-  ? process.env.PRODUCTION_PORT
-  : process.env.LOCALHOST_PORT
+const PORT = isProduction ? process.env.PRODUCTION_PORT : process.env.LOCALHOST_PORT
 const app = express()
 const path = require('path')
 const cors = require('cors')
@@ -21,17 +19,13 @@ const posts = require('./routes/posts.route')
 const magnets = require('./routes/magnets.route')
 const auth = require('./routes/auth.route')
 const mediaLibrary = require('./routes/media-library.route')
+const banners = require('./routes/banners.route')
 
-const clientUrl = isProduction
-  ? process.env.PRODUCTION_CLIENT_URL
-  : process.env.LOCAL_CLIENT_URL
+const clientUrl = isProduction ? process.env.PRODUCTION_CLIENT_URL : process.env.LOCAL_CLIENT_URL
 
 app.use(
   cors({
-    origin: [
-      clientUrl,
-      `${clientUrl.split('//')[0]}//admin.${clientUrl.split('//')[1]}`,
-    ],
+    origin: [clientUrl, `${clientUrl.split('//')[0]}//admin.${clientUrl.split('//')[1]}`],
     credentials: true,
   })
 )
@@ -62,6 +56,7 @@ app.use('/api/posts/', posts)
 app.use('/api/magnets/', magnets)
 app.use('/api/auth/', auth)
 app.use('/api/media-library/', mediaLibrary)
+app.use('/api/banners/', banners)
 
 app.use(history())
 
@@ -72,14 +67,7 @@ app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 app.use('/', express.static('./../target-app-client-main/dist'))
 
 app.all('*', (req, res) => {
-  res
-    .status(404)
-    .sendFile(
-      path.resolve(
-        __dirname,
-        './../target-app-static-documents/public/404.html'
-      )
-    )
+  res.status(404).sendFile(path.resolve(__dirname, './../target-app-static-documents/public/404.html'))
 })
 
 app.use(errorMiddleware)
@@ -93,21 +81,12 @@ const start = async () => {
     })
 
     // https
-    if (
-      isProduction &&
-      process.env.PRODUCTION_CLIENT_URL !== 'http://localhost'
-    ) {
+    if (isProduction && process.env.PRODUCTION_CLIENT_URL !== 'http://localhost') {
       const httpsServer = https.createServer(
         {
-          key: fs.readFileSync(
-            '/etc/letsencrypt/live/anastasi-target.ru/privkey.pem'
-          ),
-          cert: fs.readFileSync(
-            '/etc/letsencrypt/live/anastasi-target.ru/cert.pem'
-          ),
-          ca: fs.readFileSync(
-            '/etc/letsencrypt/live/anastasi-target.ru/chain.pem'
-          ),
+          key: fs.readFileSync('/etc/letsencrypt/live/anastasi-target.ru/privkey.pem'),
+          cert: fs.readFileSync('/etc/letsencrypt/live/anastasi-target.ru/cert.pem'),
+          ca: fs.readFileSync('/etc/letsencrypt/live/anastasi-target.ru/chain.pem'),
         },
         app
       )

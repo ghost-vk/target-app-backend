@@ -1,8 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api')
 const { isTelegramBot } = require('./config.service')
-const bot = isTelegramBot
-  ? new TelegramBot(process.env.BOT_TOKEN, { polling: true })
-  : {}
+const bot = isTelegramBot ? new TelegramBot(process.env.BOT_TOKEN, { polling: false }) : {}
 
 const plug = async (chatId, message) => {
   console.log(`🔵 [FAKE] Send message with Telegram Bot to chat id: ${chatId}\nMessage: ${message}`)
@@ -12,13 +10,7 @@ const plug = async (chatId, message) => {
 module.exports = {
   async sendMessageWithTelegramBot(chatId, message) {
     try {
-      let response
-      if (isTelegramBot) {
-        response = await bot.sendMessage(chatId, message)
-      } else {
-        response = await plug(chatId, message)
-      }
-      return response
+      return isTelegramBot ? await bot.sendMessage(chatId, message) : await plug(chatId, message)
     } catch (e) {
       console.warn('Error when sending message with telegram bot.\n', e)
     }
