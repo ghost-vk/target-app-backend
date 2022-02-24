@@ -3,8 +3,10 @@ const fs = require('fs')
 const http = require('http')
 const https = require('https')
 const express = require('express')
+const debug = require('debug')('http')
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = isProduction ? process.env.PRODUCTION_PORT : process.env.LOCALHOST_PORT
+const HTTPS_PORT = process.env.HTTPS_PORT
 const app = express()
 const path = require('path')
 const cors = require('cors')
@@ -25,7 +27,7 @@ const clientUrl = isProduction ? process.env.PRODUCTION_CLIENT_URL : process.env
 
 app.use(
   cors({
-    origin: [clientUrl, `${clientUrl.split('//')[0]}//admin.${clientUrl.split('//')[1]}`],
+    origin: [clientUrl, 'https://admin.anastasi-target.ru:8080'],
     credentials: true,
   })
 )
@@ -64,7 +66,7 @@ const adminApp = express()
 adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
-app.use('/', express.static('./../target-app-client-main/dist'))
+// app.use('/', express.static('./../target-app-client-main/dist'))
 
 app.all('*', (req, res) => {
   res.status(404).sendFile(path.resolve(__dirname, './../target-app-static-documents/public/404.html'))
@@ -77,7 +79,7 @@ const start = async () => {
     // http
     const httpServer = http.createServer(app)
     httpServer.listen(PORT, () => {
-      console.log(`Server started on port ${PORT} ...`)
+      debug('Server started on port %s ...', PORT)
     })
 
     // https
@@ -90,12 +92,13 @@ const start = async () => {
         },
         app
       )
-      httpsServer.listen(443, () => {
-        console.log('HTTPS Server started on port 443 ...')
+
+      httpsServer.listen(HTTPS_PORT, () => {
+        debug('HTTPS Server started on port %s ...', HTTPS_PORT)
       })
     }
   } catch (err) {
-    console.log(err)
+    debug('Error occurs when start server:\n%O', err)
   }
 }
 start()
