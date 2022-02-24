@@ -21,7 +21,6 @@
   },
   "homepage": "https://github.com/ghost-vk/target-app-backend#readme",
   "dependencies": {
-    "@heroicons/vue": "^1.0.5",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "connect-history-api-fallback": "^1.6.0",
