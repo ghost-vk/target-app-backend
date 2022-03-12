@@ -43,8 +43,14 @@ const magnetSchema = yup.object({
   description: yup.string()
 })
 
+const userRegistrationWithLoginSchema = yup.object({
+  login: yup.string().required().min(5).max(32),
+  password: yup.string().required().min(6).max(32),
+})
+
 module.exports = {
   lidSchema,
   postSchema,
-  magnetSchema
+  magnetSchema,
+  userRegistrationWithLoginSchema
 }

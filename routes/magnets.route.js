@@ -3,6 +3,7 @@ const router = express.Router()
 const MagnetsController = require('./../controllers/magnets.controller')
 const MulterUtil = require('../utils/MulterUtil')
 const multer = require('multer')
+const { asyncMiddleware } = require('middleware-async')
 const authMiddleware = require('./../middleware/auth.middleware')
 const adminAuthMiddleware = require('./../middleware/admin-auth.middleware')
 
@@ -27,7 +28,7 @@ const upload = multer({
  */
 router.post(
   '/',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   upload.single('image'),
   MagnetsController.add.bind(MagnetsController)
@@ -43,7 +44,7 @@ router.post(
  */
 router.put(
   '/field/:id/:field',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   MagnetsController.updateField
 )
@@ -57,7 +58,7 @@ router.put(
  */
 router.put(
   '/image/:id',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   upload.single('image'),
   MagnetsController.updateThumbnail
@@ -89,7 +90,7 @@ router.get('/:id', MagnetsController.getMagnet)
  */
 router.delete(
   '/:id',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   MagnetsController.delete
 )

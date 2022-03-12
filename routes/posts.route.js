@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const multer = require('multer')
+const { asyncMiddleware } = require('middleware-async')
 const MulterUtil = require('../utils/MulterUtil')
 const PostsController = require('./../controllers/posts.controller')
 const authMiddleware = require('./../middleware/auth.middleware')
@@ -31,7 +32,7 @@ const upload = multer({
  */
 router.post(
   '/',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   upload.single('image'),
   PostsController.addPost.bind(PostsController)
@@ -65,7 +66,7 @@ router.get('/:id', PostsController.getPost)
  */
 router.delete(
   '/:id',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   PostsController.deletePost
 )
@@ -80,7 +81,7 @@ router.delete(
  */
 router.put(
   '/field/:id/:field',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   PostsController.updateField
 )
@@ -94,7 +95,7 @@ router.put(
  */
 router.put(
   '/thumbnail/:id',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   upload.single('image'),
   PostsController.updateThumbnail

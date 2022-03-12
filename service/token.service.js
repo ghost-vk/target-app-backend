@@ -6,9 +6,11 @@ class TokenService {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
       expiresIn: '30m',
     })
+
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
       expiresIn: '60d',
     })
+
     return {
       accessToken,
       refreshToken,
@@ -17,8 +19,7 @@ class TokenService {
 
   validateAccessToken(token) {
     try {
-      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET)
-      return userData
+      return jwt.verify(token, process.env.JWT_ACCESS_SECRET)
     } catch (e) {
       return null
     }
@@ -26,8 +27,7 @@ class TokenService {
 
   validateRefreshToken(token) {
     try {
-      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
-      return userData
+      return jwt.verify(token, process.env.JWT_REFRESH_SECRET)
     } catch (e) {
       return null
     }
@@ -37,7 +37,9 @@ class TokenService {
     const tokenData = await db.query('SELECT * FROM tokens WHERE user_id=$1', [
       userId,
     ])
+
     let newTokenData
+
     if (tokenData.rows.length > 0) {
       // already registered
       newTokenData = await db.query(
@@ -60,8 +62,8 @@ class TokenService {
       `DELETE FROM tokens WHERE refresh_token=$1 RETURNING *`,
       [refreshToken]
     )
-    const deletedToken = tokenData.rows[0] || {}
-    return deletedToken
+
+    return tokenData.rows[0] || {}
   }
 
   async findToken(refreshToken) {
@@ -69,8 +71,8 @@ class TokenService {
       'SELECT * FROM tokens WHERE refresh_token=$1',
       [refreshToken]
     )
-    const token = tokenData.rows[0] || false
-    return token
+
+    return tokenData.rows[0] || false
   }
 }
 

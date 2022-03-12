@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const { asyncMiddleware } = require('middleware-async')
+
 const MediaLibraryController = require('./../controllers/media-library.controller')
 
 const multer = require('multer')
@@ -14,7 +16,7 @@ const upload = multer({
 
 router.post(
   '/',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   upload.fields([{ name: 'photos', maxCount: 10 }]),
   MediaLibraryController.addPhotos
@@ -22,14 +24,14 @@ router.post(
 
 router.get(
   '/',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   MediaLibraryController.getAllPhotos
 )
 
 router.delete(
   '/',
-  authMiddleware,
+  asyncMiddleware(authMiddleware),
   adminAuthMiddleware,
   MediaLibraryController.deleteFile
 )

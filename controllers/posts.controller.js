@@ -32,6 +32,7 @@ class PostsController {
         .json({ status: 'error', message: 'Something going wrong' })
     }
   }
+
   prepareValuesForPosting(req) {
     return new Promise(async (resolve, reject) => {
       let image = req.file ? uploadFolder + req.file.filename : null

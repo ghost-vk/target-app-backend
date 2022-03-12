@@ -4,15 +4,18 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const debug = require('debug')('http')
+const { asyncMiddleware } = require('middleware-async')
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = isProduction ? process.env.PRODUCTION_PORT : process.env.LOCALHOST_PORT
 const HTTPS_PORT = process.env.HTTPS_PORT
 const app = express()
+const adminApp = express()
 const path = require('path')
 const cors = require('cors')
 const history = require('connect-history-api-fallback')
 const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middleware/error.middleware')
+const authMiddleware = require('./middleware/auth.middleware')
 const vhost = require('./middleware/vhost.middleware')
 
 const lid = require('./routes/lid.route')
@@ -22,12 +25,16 @@ const magnets = require('./routes/magnets.route')
 const auth = require('./routes/auth.route')
 const mediaLibrary = require('./routes/media-library.route')
 const banners = require('./routes/banners.route')
+const users = require('./routes/users.route')
 
 const clientUrl = isProduction ? process.env.PRODUCTION_CLIENT_URL : process.env.LOCAL_CLIENT_URL
 
+const corsOrigins = isProduction ? [/anastasi-target\.ru$/, /\.anastasi-target\.ru:8080$/, 'https://school-anastasi-target.ru']
+  : [/localhost:8080$/, /\.localhost:8080$/, /localhost:3000$/, /\.localhost:8080$/, /192\.168\.1\.72:3000$/, /10\.0\.0\.\d:3000/]
+
 app.use(
   cors({
-    origin: [clientUrl, 'https://admin.anastasi-target.ru:8080'],
+    origin: corsOrigins,
     credentials: true,
   })
 )
@@ -51,7 +58,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
-app.use('/s', express.static('./../target-app-static-documents/public'))
+app.use('/courses-media', asyncMiddleware(authMiddleware), express.static('./../courses-media'))
 app.use('/api/lid/', lid)
 app.use('/api/reviews/', reviews)
 app.use('/api/posts/', posts)
@@ -59,14 +66,14 @@ app.use('/api/magnets/', magnets)
 app.use('/api/auth/', auth)
 app.use('/api/media-library/', mediaLibrary)
 app.use('/api/banners/', banners)
+app.use('/api/users', users)
 
-app.use(history())
-
-const adminApp = express()
 adminApp.use('/', express.static('./../target-app-admin/dist/spa'))
+
 app.use(vhost(`admin.${clientUrl.split('//')[1]}`, adminApp))
 
-// app.use('/', express.static('./../target-app-client-main/dist'))
+app.use(history())
+adminApp.use(history())
 
 app.all('*', (req, res) => {
   res.status(404).sendFile(path.resolve(__dirname, './../target-app-static-documents/public/404.html'))
