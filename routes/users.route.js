@@ -21,6 +21,10 @@ router.post(
   UserController.getAvailableCourses
 )
 
-// router.post('/add-course')
+router.post(
+  '/createStaticKey',
+  asyncMiddleware(authMiddleware),
+  UserController.createNewStaticKey
+)
 
 module.exports = router

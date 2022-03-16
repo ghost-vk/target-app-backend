@@ -4,7 +4,7 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const debug = require('debug')('http')
-const { asyncMiddleware } = require('middleware-async')
+// const { asyncMiddleware } = require('middleware-async')
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = isProduction ? process.env.PRODUCTION_PORT : process.env.LOCALHOST_PORT
 const HTTPS_PORT = process.env.HTTPS_PORT
@@ -15,7 +15,8 @@ const cors = require('cors')
 const history = require('connect-history-api-fallback')
 const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middleware/error.middleware')
-const authMiddleware = require('./middleware/auth.middleware')
+// const authMiddleware = require('./middleware/auth.middleware')
+const authStaticMiddleware = require('./middleware/auth-static.middleware')
 const vhost = require('./middleware/vhost.middleware')
 
 const lid = require('./routes/lid.route')
@@ -58,7 +59,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
-app.use('/courses-media', asyncMiddleware(authMiddleware), express.static('./../courses-media'))
+app.use('/courses-media', authStaticMiddleware, express.static('./../courses-media'))
 app.use('/api/lid/', lid)
 app.use('/api/reviews/', reviews)
 app.use('/api/posts/', posts)

@@ -6,6 +6,7 @@ const UserService = require('./../service/user.service')
 const AvailableCoursesService = require('./../service/available-courses.service')
 const isProduction = process.env.NODE_ENV === 'production'
 const { userRegistrationWithLoginSchema } = require('./../utils/validation-schemes')
+const StaticKey = require('./../service/static-key')
 
 class UserController {
   async login(req, res, next) {
@@ -22,11 +23,15 @@ class UserController {
 
       if (!userData) return next(ApiError.BadRequest(err.message))
 
-      res.cookie('target_app_refresh_token', userData.refreshToken, {
+      const options = {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
         secure: isProduction,
-      })
+      }
+
+      if (isProduction) options.sameSite = 'none'
+
+      res.cookie('target_app_refresh_token', userData.refreshToken, options)
 
       debug('Send userData to client when login: %O', userData)
 
@@ -47,11 +52,16 @@ class UserController {
       if (userData.user.role !== 'admin') {
         return next(ApiError.BadRequest('No Access', errors.array()))
       }
-      res.cookie('target_app_refresh_token', userData.refreshToken, {
+
+      const options = {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
         secure: isProduction,
-      })
+      }
+
+      if (isProduction) options.sameSite = 'none'
+
+      res.cookie('target_app_refresh_token', userData.refreshToken, options)
       return res.json(userData)
     } catch (e) {
       next(e)
@@ -71,15 +81,23 @@ class UserController {
 
   async refresh(req, res, next) {
     try {
-      const { target_app_refresh_token } = req.cookies
+      const token = req.cookies.target_app_refresh_token
+        ? req.cookies.target_app_refresh_token
+        : req.body.token
 
-      const userData = await UserService.refresh(target_app_refresh_token)
+      if (!token) return false
 
-      res.cookie('target_app_refresh_token', userData.refreshToken, {
+      const userData = await UserService.refresh(token)
+
+      const options = {
         maxAge: 30 * 24 * 3600000,
         httpOnly: true,
         secure: isProduction,
-      })
+      }
+
+      if (isProduction) options.sameSite = 'none'
+
+      res.cookie('target_app_refresh_token', userData.refreshToken, options)
 
       debug('Send userData to client when refresh: %O', userData)
 
@@ -140,6 +158,10 @@ class UserController {
     } catch (e) {
       next(e)
     }
+  }
+
+  async createNewStaticKey(req, res) {
+    res.json({ key: StaticKey.createKey() })
   }
 }
 

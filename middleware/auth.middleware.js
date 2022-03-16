@@ -5,30 +5,16 @@ const tokenService = require('./../service/token.service')
 module.exports = async function (req, res, next) {
   try {
     const authorizationHeader = req.headers.authorization
-    const refreshToken = req.cookies.target_app_refresh_token
-
-    if (refreshToken) {
-      debug('Request without authorization header but with refresh token: %s', refreshToken)
-      const userData = tokenService.validateRefreshToken(refreshToken)
-      const tokenFromDb = await tokenService.findToken(refreshToken)
-
-      if (!userData || !tokenFromDb) return next(ApiError.UnauthorizedError())
-
-      if (!userData) return next(ApiError.UnauthorizedError())
-
-      req.user = userData
-
-      return next()
-    }
 
     if (!authorizationHeader) {
-      debug('No authorization header in request')
+      debug('No Authorization header in request.')
       return next(ApiError.UnauthorizedError())
     }
 
     const accessToken = authorizationHeader.split(' ')[1]
 
     if (!accessToken) {
+      debug('No access token in request headers.')
       return next(ApiError.UnauthorizedError())
     }
 
