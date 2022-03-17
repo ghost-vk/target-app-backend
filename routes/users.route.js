@@ -21,10 +21,6 @@ router.post(
   UserController.getAvailableCourses
 )
 
-router.post(
-  '/createStaticKey',
-  asyncMiddleware(authMiddleware),
-  UserController.createNewStaticKey
-)
+router.post('/saveIpAddress', asyncMiddleware(authMiddleware), UserController.saveIpAddress)
 
 module.exports = router

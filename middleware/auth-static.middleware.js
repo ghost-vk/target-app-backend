@@ -1,17 +1,17 @@
 const debug = require('debug')('middleware:auth-static')
-const StaticKey = require('./../service/static-key')
-const ApiError = require('../exceptions/api-error')
+const ApiError = require('./../exceptions/api-error')
+const IpStoreService = require('./../service/ip-store:service')
 
 module.exports = function (req, res, next) {
-  debug('Cookies: %O', req.cookies)
+  const ip = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress
 
-  if (!req.cookies.target_app_static_key) {
-    debug('No cookie "target_app_static_key"')
+  if (!ip) {
+    debug('Not IP provided')
     return next(ApiError.UnauthorizedError())
   }
 
-  if (!StaticKey.isKeyValid(req.cookies.target_app_static_key)) {
-    debug('Static key is not valid')
+  if (!IpStoreService.isAllowedIp(ip)) {
+    debug('Not allowed IP: %s', ip)
     return next(ApiError.UnauthorizedError())
   }
 
