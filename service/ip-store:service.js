@@ -1,0 +1,5 @@
+let allowedIpAdresses = []
+
+class IpStore {
+
+}
