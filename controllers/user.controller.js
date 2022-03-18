@@ -7,7 +7,7 @@ const AvailableCoursesService = require('./../service/available-courses.service'
 const isProduction = process.env.NODE_ENV === 'production'
 const { userRegistrationWithLoginSchema } = require('./../utils/validation-schemes')
 const IpStoreService = require('./../service/ip-store:service')
-
+:
 class UserController {
   async login(req, res, next) {
     try {
@@ -118,8 +118,7 @@ class UserController {
       const user = await UserService.getUserByLogin(userData.login)
 
       if (user) {
-        const error = new ApiError(409, `Login ${userData.login} is not available.`)
-        next(error)
+        res.json({ error: 'User already exist.' })
       }
 
       await userRegistrationWithLoginSchema.validateAt('password', userData)
@@ -136,6 +135,7 @@ class UserController {
       }
 
       const response = !addRequest ? { user: newUser } : { user: newUser, availableCourses: addRequest.courses }
+      response.status = 'ok'
 
       res.json(response)
     } catch (e) {
