@@ -7,7 +7,7 @@ const AvailableCoursesService = require('./../service/available-courses.service'
 const isProduction = process.env.NODE_ENV === 'production'
 const { userRegistrationWithLoginSchema } = require('./../utils/validation-schemes')
 const IpStoreService = require('./../service/ip-store:service')
-:
+
 class UserController {
   async login(req, res, next) {
     try {
