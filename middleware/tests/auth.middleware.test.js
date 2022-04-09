@@ -44,7 +44,6 @@ describe('Authorization middleware', () => {
       headers: { authorization: 'Bearer token' },
       user: mockUserData,
     })
-    expect(nextFunction).toHaveBeenCalledTimes(1)
   })
 
   test('Failed validation token', () => {
