@@ -5,7 +5,9 @@ const ApiError = require('./../exceptions/api-error')
 const UserService = require('./../service/user.service')
 const AvailableCoursesService = require('./../service/available-courses.service')
 const isProduction = process.env.NODE_ENV === 'production'
-const { userRegistrationWithLoginSchema } = require('./../utils/validation-schemes')
+const {
+  userRegistrationWithLoginSchema,
+} = require('./../utils/validation-schemes')
 const IpStoreService = require('./../service/ip-store:service')
 
 class UserController {
@@ -81,7 +83,9 @@ class UserController {
 
   async refresh(req, res, next) {
     try {
-      const token = req.cookies.target_app_refresh_token ? req.cookies.target_app_refresh_token : req.body.token
+      const token = req.cookies.target_app_refresh_token
+        ? req.cookies.target_app_refresh_token
+        : req.body.token
 
       if (!token) return false
 
@@ -123,18 +127,26 @@ class UserController {
 
       await userRegistrationWithLoginSchema.validateAt('password', userData)
 
-      const newUser = await UserService.createWithLogin(userData.login, userData.password)
+      const newUser = await UserService.createWithLogin(
+        userData.login,
+        userData.password
+      )
 
       let addRequest = null
       if (userData.attachedCourses) {
-        ;[err, addRequest] = await to(UserService.addCoursesToUser(newUser.id, userData.attachedCourses))
+        ;[err, addRequest] = await to(
+          UserService.addCoursesToUser(newUser.id, userData.attachedCourses)
+        )
 
         if (err) return next(err)
 
         if (addRequest.error) return next(new Error(addRequest.error))
       }
 
-      const response = !addRequest ? { user: newUser } : { user: newUser, availableCourses: addRequest.courses }
+      const response = !addRequest
+        ? { user: newUser }
+        : { user: newUser, availableCourses: addRequest.courses }
+
       response.status = 'ok'
 
       res.json(response)
@@ -146,7 +158,10 @@ class UserController {
 
   async getAvailableCourses(req, res, next) {
     try {
-      const courses = await AvailableCoursesService.getAvailableCoursesForUserById(req.body.userId)
+      const courses =
+        await AvailableCoursesService.getAvailableCoursesForUserById(
+          req.body.userId
+        )
 
       const status = courses ? 'ok' : 'error'
 
@@ -157,7 +172,9 @@ class UserController {
   }
 
   async saveIpAddress(req, res, next) {
-    const ip = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress
+    const ip =
+      req.headers['x-forwarded-for']?.split(',').shift() ||
+      req.socket?.remoteAddress
 
     if (!ip) return next(ApiError.UnauthorizedError())
 

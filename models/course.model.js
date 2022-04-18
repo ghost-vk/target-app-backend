@@ -46,7 +46,8 @@ class CourseModel {
      */
     this.description = data.description
 
-    const releaseDate = data.release instanceof Date ? data.release : new Date(data.release)
+    const releaseDate =
+      data.release instanceof Date ? data.release : new Date(data.release)
 
     /**
      * @public
@@ -54,7 +55,10 @@ class CourseModel {
      */
     this.release = dateToDDMMYYYY(releaseDate)
 
-    const lastUpdate = data.last_update instanceof Date ? data.last_update : new Date(data.last_update)
+    const lastUpdate =
+      data.last_update instanceof Date
+        ? data.last_update
+        : new Date(data.last_update)
 
     /**
      * @public
@@ -68,6 +72,8 @@ class CourseModel {
      * @type {string}
      */
     this.image = data.image
+
+    if (data.access_to) this.setAccessToDate(data.access_to)
   }
 
   /**
@@ -80,7 +86,9 @@ class CourseModel {
         return false
       }
 
-      const dbResponse = await db.query(`SELECT * FROM courses WHERE id=$1`, [id])
+      const dbResponse = await db.query(`SELECT * FROM courses WHERE id=$1`, [
+        id,
+      ])
 
       debug('Database query: SELECT * FROM courses WHERE id=%s', id)
       debug('Response: %O', dbResponse.rows)
@@ -96,20 +104,24 @@ class CourseModel {
   }
 
   /**
-   * @param {object} date
-   * @param {string} date.string
-   * @param {Date} date.date
+   * @param {Date | string} date
    */
   setAccessToDate(date) {
+    const accessTo = date
+      ? date instanceof Date
+        ? date
+        : new Date(date)
+      : null
+
     /**
      * @type {Date}
      */
-    this.accessToDate = date.date
+    this.accessToDate = accessTo
 
     /**
      * @type {string}
      */
-    this.accessToString = date.string
+    this.accessToString = accessTo ? dateToDDMMYYYY(accessTo) : ''
   }
 
   /**
