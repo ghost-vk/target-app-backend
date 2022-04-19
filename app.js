@@ -4,8 +4,6 @@ const http = require('http')
 const https = require('https')
 const express = require('express')
 const debug = require('debug')('http')
-const debugReq = require('debug')('req')
-// const { asyncMiddleware } = require('middleware-async')
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = isProduction ? process.env.PRODUCTION_PORT : process.env.LOCALHOST_PORT
 const HTTPS_PORT = process.env.HTTPS_PORT
@@ -27,6 +25,7 @@ const auth = require('./routes/auth.route')
 const mediaLibrary = require('./routes/media-library.route')
 const banners = require('./routes/banners.route')
 const users = require('./routes/users.route')
+const healthCheck = require('./routes/health-check.route')
 
 const clientUrl = isProduction ? process.env.PRODUCTION_CLIENT_URL : process.env.LOCAL_CLIENT_URL
 
@@ -68,6 +67,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/documentation', express.static('./out'))
 app.use('/public', express.static('./public'))
 app.use('/courses-media', authStaticMiddleware, express.static('./../courses-media'))
+app.use('/api/health-check', healthCheck)
 app.use('/api/lid/', lid)
 app.use('/api/reviews/', reviews)
 app.use('/api/posts/', posts)
