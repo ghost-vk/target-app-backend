@@ -1,10 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const LidController = require('./../controllers/lid.controller')
+const LeadController = require('./../controllers/lead.controller')
 
-/**
- * @name api/lid
- */
-router.post('/', LidController.createLid.bind(LidController))
+router.post('/', LeadController.createLead.bind(LeadController))
 
 module.exports = router

@@ -14,16 +14,10 @@ const errorMessages = {
 }
 
 const lidSchema = yup.object({
-  name: yup
-    .string()
-    .min(2, errorMessages.minLengthString)
-    .max(50, errorMessages.maxLengthString),
+  name: yup.string().min(2, errorMessages.minLengthString).max(50, errorMessages.maxLengthString),
   phone: yup.string().required(errorMessages.required),
   email: yup.string().email(errorMessages.shouldEmail),
-  source: yup
-    .string()
-    .min(5, errorMessages.minLengthString)
-    .max(100, errorMessages.maxLengthString),
+  source: yup.string().min(5, errorMessages.minLengthString).max(100, errorMessages.maxLengthString),
   contactType: yup.string().max(50, errorMessages.maxLengthString),
 })
 
@@ -34,13 +28,13 @@ const postSchema = yup.object({
   content: yup.string(),
   recommended: yup.number().integer().positive(),
   category: yup.number().integer().positive(),
-  tags: yup.string()
+  tags: yup.string(),
 })
 
 const magnetSchema = yup.object({
   name: yup.string().required().min(8, errorMessages.minLengthString).max(255, errorMessages.maxLengthString),
   link: yup.string().required().min(8, errorMessages.minLengthString).max(255, errorMessages.maxLengthString),
-  description: yup.string()
+  description: yup.string(),
 })
 
 const userRegistrationWithLoginSchema = yup.object({
@@ -52,5 +46,5 @@ module.exports = {
   lidSchema,
   postSchema,
   magnetSchema,
-  userRegistrationWithLoginSchema
+  userRegistrationWithLoginSchema,
 }

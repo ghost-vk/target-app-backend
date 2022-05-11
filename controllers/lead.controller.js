@@ -1,21 +1,15 @@
+const { isValidPhoneNumber, isSupportedCountry, parsePhoneNumber } = require('libphonenumber-js')
+const debug = require('debug')('controller:lid')
+
 const db = require('./../db')
 const { lidSchema } = require('./../utils/validation-schemes')
-require('dotenv').config()
-const {
-  isValidPhoneNumber,
-  isSupportedCountry,
-  parsePhoneNumber,
-} = require('libphonenumber-js')
 const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service')
-
 
 /**
  * Controller of '/api/lid'
- * @class
  */
-class LidController {
+class LeadController {
   /**
-   * Method access by POST method
    * Method creates lid and save to database
    * @param {string|undefined}  name - The name of lid. Should be min length 2.
    * @param {string} phone - The valid phone number of lid.
@@ -25,16 +19,7 @@ class LidController {
    * @param {boolean|undefined} shouldCallback - Flag shows necessary of call back to lid.
    * @returns {object} Returns empty body with status 204 if success and object with errors if not: { status: 'error', errors: { name: '...', phone: '...', countryCode: '', email: '...', source: '...'  } }
    */
-  async createLid(req, res) {
-    const data = {
-      name: req.body.name,
-      phone: req.body.phone,
-      countryCode: req.body.countryCode,
-      email: req.body.email,
-      source: req.body.source,
-      shouldCallback: req.body.shouldCallback,
-      contactType: req.body.contactType,
-    }
+  async createLead(req, res) {
     const errors = {
       name: '',
       phone: '',
@@ -43,34 +28,54 @@ class LidController {
       source: '',
       contactType: '',
     }
+
     try {
-      await lidSchema.validate(data, { abortEarly: false })
-      if (!isSupportedCountry(data.countryCode)) {
+      const leadData = {
+        name: req.body.name,
+        phone: req.body.phone,
+        countryCode: req.body.countryCode,
+        email: req.body.email,
+        source: req.body.source,
+        shouldCallback: req.body.shouldCallback,
+        contactType: req.body.contactType,
+      }
+
+      await lidSchema.validate(leadData, { abortEarly: false })
+
+      if (!isSupportedCountry(leadData.countryCode)) {
         errors.phone = 'Не поддерживаемый код страны'
         res.status(405).json({ status: 'error', errors })
       }
-      if (!isValidPhoneNumber(data.phone, data.countryCode)) {
+
+      if (!isValidPhoneNumber(leadData.phone, leadData.countryCode)) {
         errors.phone = 'Не действительный номер телефона'
         res.status(405).json({ status: 'error', errors })
       }
-      const parsedPhone = parsePhoneNumber(
-        data.phone,
-        data.countryCode
-      ).formatInternational()
-      const newLid = await db.query(
-        `INSERT INTO lids (name, phone, email, source, country_code) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-        [data.name, parsedPhone, data.email, data.source, data.countryCode]
-      )
-      if (newLid.rows[0]?.phone?.length > 0) {
+
+      const parsedPhone = parsePhoneNumber(leadData.phone, leadData.countryCode).formatInternational()
+
+      const insertQuery = `INSERT INTO lids(name, phone, email, source, country_code) 
+                           VALUES ($1, $2, $3, $4, $5) 
+                           RETURNING *`
+
+      const newLeadDbResponse = await db.query(insertQuery, [
+        leadData.name,
+        parsedPhone,
+        leadData.email,
+        leadData.source,
+        leadData.countryCode,
+      ])
+      if (newLeadDbResponse.rows[0]?.phone?.length > 0) {
         res.status(204).json({})
       } else {
         res.status(500).json({ status: 'error' })
       }
-      if (data.shouldCallback) {
-        await this.notificateAboutLid({ ...data, phone: parsedPhone })
+
+      if (leadData.shouldCallback) {
+        await this.notificateAboutLid({ ...leadData, phone: parsedPhone })
       }
     } catch (err) {
-      console.log(err)
+      debug('Error in lead controller (createLead): %O', err)
       err?.inner?.forEach((error) => {
         errors[error.path] = errors[error.path] || error.message
       })
@@ -79,17 +84,18 @@ class LidController {
   }
 
   /**
-   *
    * @returns {Promise<void>}
    */
   async notificateAboutLid(data) {
     try {
-      const message = `${data.name} запрашивает обратную связь через ${data.contactType}\nНомер телефона: ${data.phone}\nИсточник: ${data.source}`
+      const message =
+        `${data.name} запрашивает обратную связь через ${data.contactType}\n` +
+        `Номер телефона: ${data.phone}\nИсточник: ${data.source}`
       await sendMessageWithTelegramBot(process.env.CHAT_ID, message)
     } catch (err) {
-      console.warn(err)
+      debug('Error in lead controller (notificateAboutLid): %O', err)
     }
   }
 }
 
-module.exports = new LidController()
+module.exports = new LeadController()

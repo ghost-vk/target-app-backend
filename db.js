@@ -1,11 +1,11 @@
-const path = require('path')
 const Pool = require('pg').Pool
 const debug = require('debug')('db')
-require('dotenv').config({ path: path.resolve(__dirname, '/.env') })
 
-const user = process.env.DB_USER
-const database = process.env.DB_NAME
-const password = process.env.DB_PASSWORD
+const user = process.env.POSTGRES_USER
+const database = process.env.POSTGRES_DB
+const password = process.env.POSTGRES_PASSWORD
+const host = process.env.POSTGRES_HOST || 'localhost'
+const port = process.env.POSTGRES_PORT || 5432
 
 debug('Connect to Database: %s', database)
 debug('User: %s', user)
@@ -18,8 +18,8 @@ const pool = new Pool({
   user,
   password,
   database,
-  host: 'localhost',
-  port: 5432,
+  host,
+  port,
 })
 
 module.exports = pool
