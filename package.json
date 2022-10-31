@@ -4,10 +4,9 @@
   "description": "Server side application. Provides REST API.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env NODE_ENV=development DEBUG=* nodemon app.js",
     "production": "cross-env NODE_ENV=production node app.js",
-    "forever": "NODE_ENV=production forever start -m 5 -e ./../logs/err.log --spinSleepTime 6000 app.js"
+    "forever": "cross-env NODE_ENV=production forever start -m 5 -e ./err.log --spinSleepTime 6000 app.js"
   },
   "repository": {
     "type": "git",
@@ -22,11 +21,13 @@
   "homepage": "https://github.com/ghost-vk/target-app-backend#readme",
   "dependencies": {
     "await-to-js": "^3.0.0",
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "debug": "^4.3.3",
+    "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.1",
     "express-validator": "^6.12.2",
@@ -40,7 +41,6 @@
     "yup": "^0.32.9"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "jest": "^27.5.1",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2"
