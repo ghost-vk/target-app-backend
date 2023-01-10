@@ -1,17 +1,18 @@
-version: "3.9"
+version: '3.9'
 
 services:
-  db:
-    image: postgres:13
+  target-old-db:
+    container_name: target-old-db
+    image: postgres:14
     ports:
-      - ${DB_BIND}:5432
+      - ${POSTGRES_PORT}:5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - db_data:/var/lib/postgresql/data
-  
+
 volumes:
   db_data:
 

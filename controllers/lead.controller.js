@@ -1,9 +1,9 @@
-const { isValidPhoneNumber, isSupportedCountry, parsePhoneNumber } = require('libphonenumber-js')
-const debug = require('debug')('controller:lid')
+const { isValidPhoneNumber, isSupportedCountry, parsePhoneNumber } = require('libphonenumber-js');
+const debug = require('debug')('controller:lid');
 
-const db = require('./../db')
-const { lidSchema } = require('./../utils/validation-schemes')
-const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service')
+const db = require('./../db');
+const { leadSchema } = require('./../utils/validation-schemes');
+const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service');
 
 /**
  * Controller of '/api/lid'
@@ -27,7 +27,7 @@ class LeadController {
       email: '',
       source: '',
       contactType: '',
-    }
+    };
 
     try {
       const leadData = {
@@ -38,25 +38,28 @@ class LeadController {
         source: req.body.source,
         shouldCallback: req.body.shouldCallback,
         contactType: req.body.contactType,
-      }
+      };
 
-      await lidSchema.validate(leadData, { abortEarly: false })
+      await leadSchema.validate(leadData, { abortEarly: false });
 
       if (!isSupportedCountry(leadData.countryCode)) {
-        errors.phone = 'Не поддерживаемый код страны'
-        res.status(405).json({ status: 'error', errors })
+        errors.phone = 'Не поддерживаемый код страны';
+        res.status(405).json({ status: 'error', errors });
       }
 
       if (!isValidPhoneNumber(leadData.phone, leadData.countryCode)) {
-        errors.phone = 'Не действительный номер телефона'
-        res.status(405).json({ status: 'error', errors })
+        errors.phone = 'Не действительный номер телефона';
+        res.status(405).json({ status: 'error', errors });
       }
 
-      const parsedPhone = parsePhoneNumber(leadData.phone, leadData.countryCode).formatInternational()
+      const parsedPhone = parsePhoneNumber(
+        leadData.phone,
+        leadData.countryCode,
+      ).formatInternational();
 
       const insertQuery = `INSERT INTO lids(name, phone, email, source, country_code) 
                            VALUES ($1, $2, $3, $4, $5) 
-                           RETURNING *`
+                           RETURNING *`;
 
       const newLeadDbResponse = await db.query(insertQuery, [
         leadData.name,
@@ -64,22 +67,22 @@ class LeadController {
         leadData.email,
         leadData.source,
         leadData.countryCode,
-      ])
+      ]);
       if (newLeadDbResponse.rows[0]?.phone?.length > 0) {
-        res.status(204).json({})
+        res.status(204).json({});
       } else {
-        res.status(500).json({ status: 'error' })
+        res.status(500).json({ status: 'error' });
       }
 
       if (leadData.shouldCallback) {
-        await this.notificateAboutLid({ ...leadData, phone: parsedPhone })
+        await this.notificateAboutLid({ ...leadData, phone: parsedPhone });
       }
     } catch (err) {
-      debug('Error in lead controller (createLead): %O', err)
+      debug('Error in lead controller (createLead): %O', err);
       err?.inner?.forEach((error) => {
-        errors[error.path] = errors[error.path] || error.message
-      })
-      res.status(500).json({ status: 'error', errors })
+        errors[error.path] = errors[error.path] || error.message;
+      });
+      res.status(500).json({ status: 'error', errors });
     }
   }
 
@@ -90,12 +93,12 @@ class LeadController {
     try {
       const message =
         `${data.name} запрашивает обратную связь через ${data.contactType}\n` +
-        `Номер телефона: ${data.phone}\nИсточник: ${data.source}`
-      await sendMessageWithTelegramBot(process.env.CHAT_ID, message)
+        `Номер телефона: ${data.phone}\nИсточник: ${data.source}`;
+      await sendMessageWithTelegramBot(process.env.CHAT_ID, message);
     } catch (err) {
-      debug('Error in lead controller (notificateAboutLid): %O', err)
+      debug('Error in lead controller (notificateAboutLid): %O', err);
     }
   }
 }
 
-module.exports = new LeadController()
+module.exports = new LeadController();

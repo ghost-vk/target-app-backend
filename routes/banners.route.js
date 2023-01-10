@@ -1,8 +1,8 @@
-const Router = require('express').Router
-const BannersController = require('./../controllers/banners.controller')
+const Router = require('express').Router;
+const BannersController = require('./../controllers/banners.controller');
 
-const router = new Router()
+const router = new Router();
 
-router.get('/', BannersController.getBanners)
+router.get('/', BannersController.getBanners);
 
-module.exports = router
+module.exports = router;
