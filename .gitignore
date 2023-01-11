@@ -2,10 +2,15 @@
 .thumbs.db
 node_modules
 .idea
-.env
+**.env
+!example.env
+**/**.env
+!**/example.env
 public
 out
 dist
 nohup.out
 secret
 test.js
+.yarn/cache
+.yarn/install-state.gz

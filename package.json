@@ -2,6 +2,7 @@
   "name": "target-app-backend",
   "version": "1.0.0",
   "main": "app.js",
+  "packageManager": "yarn@3.2.4",
   "scripts": {
     "start:dev": "NODE_ENV=development DEBUG=* nodemon app.js",
     "start:prod": "NODE_ENV=production node app.js"
