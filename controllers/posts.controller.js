@@ -1,4 +1,5 @@
 const db = require('./../db');
+const { dbSchema } = require('./../db');
 
 class PostsController {
 
@@ -10,7 +11,7 @@ class PostsController {
       fullmode = fullmode ? fullmode : '1'; // default all data
       const selectionData = fullmode === '1' ? '*' : 'id,posting_date,title,subtitle,thumbnail';
       const dbResponse = await db.query(
-        `SELECT ${selectionData} FROM posts ${categoryFilter} ORDER BY posting_date DESC LIMIT ${limitNumber}`,
+        `SELECT ${selectionData} FROM ${dbSchema}.posts ${categoryFilter} ORDER BY posting_date DESC LIMIT ${limitNumber}`,
       );
       const records = dbResponse.rows;
       if (records.length) {
@@ -30,7 +31,7 @@ class PostsController {
       res.status(400).json({ message: 'Not provided ID' });
     }
     try {
-      const dbResponse = await db.query(`SELECT * FROM posts WHERE id=$1`, [id]);
+      const dbResponse = await db.query(`SELECT * FROM ${dbSchema}.posts WHERE id=$1`, [id]);
       const record = dbResponse.rows[0];
       if (record) {
         res.status(200).json(dbResponse.rows[0]);

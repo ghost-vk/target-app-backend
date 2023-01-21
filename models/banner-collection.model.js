@@ -1,6 +1,7 @@
 const BannerModel = require('./banner.model');
 const ApiError = require('./../exceptions/api-error');
 const db = require('./../db');
+const { dbSchema } = require('./../db');
 
 class BannerModelCollection {
   _banners;
@@ -41,7 +42,7 @@ class BannerModelCollection {
         }
       }
 
-      const response = await db.query(`SELECT * FROM banners ${options} ORDER BY priority DESC`);
+      const response = await db.query(`SELECT * FROM ${dbSchema}.banners ${options} ORDER BY priority DESC`);
 
       if (response.rows.length === 0) {
         return [];

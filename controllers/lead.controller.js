@@ -2,6 +2,7 @@ const { isValidPhoneNumber, isSupportedCountry, parsePhoneNumber } = require('li
 const debug = require('debug')('controller:lid');
 
 const db = require('./../db');
+const { dbSchema } = require('./../db');
 const { leadSchema } = require('./../utils/validation-schemes');
 const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service');
 
@@ -57,7 +58,7 @@ class LeadController {
         leadData.countryCode,
       ).formatInternational();
 
-      const insertQuery = `INSERT INTO lids(name, phone, email, source, country_code) 
+      const insertQuery = `INSERT INTO ${dbSchema}.lids(name, phone, email, source, country_code) 
                            VALUES ($1, $2, $3, $4, $5) 
                            RETURNING *`;
 

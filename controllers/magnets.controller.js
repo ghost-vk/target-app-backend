@@ -1,10 +1,11 @@
 const db = require('./../db');
+const { dbSchema } = require('./../db');
 
 class MagnetsController {
 
   async getMagnets(req, res) {
     try {
-      const dbResponse = await db.query(`SELECT * FROM magnets ORDER BY id DESC`);
+      const dbResponse = await db.query(`SELECT * FROM ${dbSchema}.magnets ORDER BY id DESC`);
       const records = dbResponse.rows;
       if (records.length) {
         res.status(200).json(records);
@@ -24,7 +25,7 @@ class MagnetsController {
     }
     try {
       const requestedFields = req.query.link === '1' ? 'link' : '*';
-      const dbResponse = await db.query(`SELECT ${requestedFields} FROM magnets WHERE id=$1`, [id]);
+      const dbResponse = await db.query(`SELECT ${requestedFields} FROM ${dbSchema}.magnets WHERE id=$1`, [id]);
       const records = dbResponse.rows;
       if (records.length) {
         res.status(200).json(records[0]);

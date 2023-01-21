@@ -1,4 +1,5 @@
 const db = require('./../db');
+const { dbSchema } = require('./../db');
 
 class ReviewsController {
   async getReviews(req, res) {
@@ -8,7 +9,7 @@ class ReviewsController {
     const catFilter = ['target-setup', 'consultation', 'education'].includes(category)
       ? 'WHERE category=$2'
       : '';
-    const query = `SELECT * FROM reviews ${catFilter} ORDER BY ${orderBy} LIMIT $1`;
+    const query = `SELECT * FROM ${dbSchema}.reviews ${catFilter} ORDER BY ${orderBy} LIMIT $1`;
     const params = catFilter ? [limit, category] : [limit];
     try {
       const reviews = await db.query(query, params);
