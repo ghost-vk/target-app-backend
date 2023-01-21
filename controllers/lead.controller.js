@@ -2,7 +2,7 @@ const { isValidPhoneNumber, isSupportedCountry, parsePhoneNumber } = require('li
 const debug = require('debug')('controller:lid');
 
 const db = require('./../db');
-const { dbSchema } = require('./../db');
+const { dbSchema } = require('./../config');
 const { leadSchema } = require('./../utils/validation-schemes');
 const { sendMessageWithTelegramBot } = require('./../service/telegram-bot.service');
 

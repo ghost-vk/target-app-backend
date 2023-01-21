@@ -1,5 +1,5 @@
 const db = require('./../db');
-const { dbSchema } = require('./../db');
+const { dbSchema } = require('./../config');
 
 class MagnetsController {
 

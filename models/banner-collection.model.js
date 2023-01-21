@@ -1,7 +1,7 @@
 const BannerModel = require('./banner.model');
 const ApiError = require('./../exceptions/api-error');
 const db = require('./../db');
-const { dbSchema } = require('./../db');
+const { dbSchema } = require('./../config');
 
 class BannerModelCollection {
   _banners;
